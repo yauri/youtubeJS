@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Bootstrap, from Twitter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        }
+    </style>
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="js/swfobject.js"></script>
+    <!--<script type="text/javascript" src="js/youtubeplayer.js"></script>-->
+    <script src="http://www.google.com/jsapi" type="text/javascript"></script>
+    <script type="text/javascript">
+        /*
+         * Chromeless player has no controls.
+         */
+
+        // Update a particular HTML element with a new value
+        function updateHTML(elmId, value) {
+            document.getElementById(elmId).innerHTML = value;
+        }
+
+        // This function is called when an error is thrown by the player
+        function onPlayerError(errorCode) {
+            alert("An error occured of type:" + errorCode);
+        }
+
+        // This function is called when the player changes state
+        function onPlayerStateChange(newState) {
+            updateHTML("playerState", newState);
+        }
+
+        // Display information about the current state of the player
+        function updatePlayerInfo() {
+            // Also check that at least one function exists since when IE unloads the
+            // page, it will destroy the SWF before clearing the interval.
+            if(ytplayer && ytplayer.getDuration) {
+                updateHTML("videoDuration", ytplayer.getDuration());
+                updateHTML("videoCurrentTime", ytplayer.getCurrentTime());
+                updateHTML("bytesTotal", ytplayer.getVideoBytesTotal());
+                updateHTML("startBytes", ytplayer.getVideoStartBytes());
+                updateHTML("bytesLoaded", ytplayer.getVideoBytesLoaded());
+                updateHTML("volume", ytplayer.getVolume());
+            }
+        }
+
+        // Allow the user to set the volume from 0-100
+        function setVideoVolume() {
+            var volume = parseInt(document.getElementById("volumeSetting").value);
+            if(isNaN(volume) || volume < 0 || volume > 100) {
+                alert("Please enter a valid volume between 0 and 100.");
+            }
+            else if(ytplayer){
+                ytplayer.setVolume(volume);
+            }
+        }
+
+        function playVideo() {
+            if (ytplayer) {
+                ytplayer.playVideo();
+            }
+        }
+
+        function pauseVideo() {
+            if (ytplayer) {
+                ytplayer.pauseVideo();
+            }
+        }
+
+        function muteVideo() {
+            if(ytplayer) {
+                ytplayer.mute();
+            }
+        }
+
+        function unMuteVideo() {
+            if(ytplayer) {
+                ytplayer.unMute();
+            }
+        }
+
+
+        // This function is automatically called by the player once it loads
+        function onYouTubePlayerReady(playerId) {
+            ytplayer = document.getElementById("ytplayer");
+            // This causes the updatePlayerInfo function to be called every 250ms to
+            // get fresh data from the player
+            setInterval(updatePlayerInfo, 250);
+            updatePlayerInfo();
+            ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
+            ytplayer.addEventListener("onError", "onPlayerError");
+            //Load an initial video into the player
+            ytplayer.cueVideoById("oyepWcCnO9I");
+        }
+
+        // The "main method" of this sample. Called when someone clicks "Run".
+        function loadPlayer(){
+            // Lets Flash from another domain call JavaScript
+            var params = { allowScriptAccess: "always" };
+            // The element id of the Flash embed
+            var atts = { id: "ytplayer" };
+            // All of the magic handled by SWFObject (http://code.google.com/p/swfobject/)
+            swfobject.embedSWF("http://www.youtube.com/apiplayer?" +
+                    "version=3&enablejsapi=1&playerapiid=player1",
+                    "youtubePlayer", "480", "295", "9", null, null, params, atts);
+        }
+    </script>
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="ico/favicon.png">
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="#">Project name</a>
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <button onclick="loadPlayer()">Run</button>
+    <div id="youtubePlayer">
+        You need Flash player 8+ and JavaScript enabled to view this video.
+    </div>
+    <p>Player state: <span id="playerState">--</span></p>
+    <p>Current Time: <span id="videoCurrentTime">--:--</span> | Duration: <span id="videoDuration">--:--</span></p>
+    <p>Bytes Total: <span id="bytesTotal">--</span> | Start Bytes: <span id="startBytes">--</span> | Bytes Loaded: <span id="bytesLoaded">--</span></p>
+    <p>Controls: <a href="javascript:void(0);" onclick="playVideo();">Play</a> | <a href="javascript:void(0);" onclick="pauseVideo();">Pause</a> | <a href="javascript:void(0);" onclick="muteVideo();">Mute</a> | <a href="javascript:void(0);" onclick="unMuteVideo();">Unmute</a></p>
+    <p><input id="volumeSetting" type="text" size="3" />&nbsp;<a href="javascript:void(0)" onclick="setVideoVolume();">&lt;- Set Volume</a> | Volume: <span id="volume">--</span></p>
+
+</div> <!-- /container -->
+
+
+
+
+</body>
+</html>
