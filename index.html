@@ -16,7 +16,7 @@
         }
     </style>
     <link href="css/bootstrap-responsive.css" rel="stylesheet">
-
+    <link href="css/extended.css" rel="stylesheet">
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -93,7 +93,6 @@
             }
         }
 
-
         // This function is automatically called by the player once it loads
         function onYouTubePlayerReady(playerId) {
             ytplayer = document.getElementById("ytplayer");
@@ -157,9 +156,11 @@
     <p>Player state: <span id="playerState">--</span></p>
     <p>Current Time: <span id="videoCurrentTime">--:--</span> | Duration: <span id="videoDuration">--:--</span></p>
     <p>Bytes Total: <span id="bytesTotal">--</span> | Start Bytes: <span id="startBytes">--</span> | Bytes Loaded: <span id="bytesLoaded">--</span></p>
-    <p>Controls: <a href="javascript:void(0);" onclick="playVideo();">Play</a> | <a href="javascript:void(0);" onclick="pauseVideo();">Pause</a> | <a href="javascript:void(0);" onclick="muteVideo();">Mute</a> | <a href="javascript:void(0);" onclick="unMuteVideo();">Unmute</a></p>
     <p><input id="volumeSetting" type="text" size="3" />&nbsp;<a href="javascript:void(0)" onclick="setVideoVolume();">&lt;- Set Volume</a> | Volume: <span id="volume">--</span></p>
 
+    <button class="btn-custom" id="btnPlay" onclick="playVideo();">Play</button>
+    <button class="btn-custom" id="btnPause" onclick="pauseVideo()">Pause</button>
+    <button class="btn-custom" id="btnMute" onclick="muteVideo()">Mute</button>
 </div> <!-- /container -->
 
 
