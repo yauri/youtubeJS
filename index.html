@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Bootstrap, from Twitter</title>
+    <title>No Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -17,6 +17,7 @@
     </style>
     <link href="css/bootstrap-responsive.css" rel="stylesheet">
     <link href="css/extended.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -24,6 +25,8 @@
     <script type="text/javascript" src="js/swfobject.js"></script>
     <!--<script type="text/javascript" src="js/youtubeplayer.js"></script>-->
     <script src="http://www.google.com/jsapi" type="text/javascript"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
     <script type="text/javascript">
         /*
          * Chromeless player has no controls.
@@ -54,19 +57,20 @@
                 updateHTML("bytesTotal", ytplayer.getVideoBytesTotal());
                 updateHTML("startBytes", ytplayer.getVideoStartBytes());
                 updateHTML("bytesLoaded", ytplayer.getVideoBytesLoaded());
-                updateHTML("volume", ytplayer.getVolume());
+//                updateHTML("volume", ytplayer.getVolume());
             }
         }
 
         // Allow the user to set the volume from 0-100
-        function setVideoVolume() {
-            var volume = parseInt(document.getElementById("volumeSetting").value);
-            if(isNaN(volume) || volume < 0 || volume > 100) {
-                alert("Please enter a valid volume between 0 and 100.");
-            }
-            else if(ytplayer){
-                ytplayer.setVolume(volume);
-            }
+        function setVideoVolume(volumeLevel) {
+//            var volume = parseInt(document.getElementById("volumeSetting").value);
+//            if(isNaN(volume) || volume < 0 || volume > 100) {
+//                alert("Please enter a valid volume between 0 and 100.");
+//            }
+//            else if(ytplayer){
+//                ytplayer.setVolume(volume);
+//            }
+            ytplayer.setVolume(volumeLevel);
         }
 
         function playVideo() {
@@ -103,7 +107,7 @@
             ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
             ytplayer.addEventListener("onError", "onPlayerError");
             //Load an initial video into the player
-            ytplayer.cueVideoById("oyepWcCnO9I");
+            ytplayer.cueVideoById("OZLUa8JUR18");
         }
 
         // The "main method" of this sample. Called when someone clicks "Run".
@@ -117,6 +121,20 @@
                     "version=3&enablejsapi=1&playerapiid=player1",
                     "youtubePlayer", "480", "295", "9", null, null, params, atts);
         }
+
+    </script>
+    <script>
+        $(function() {
+            $("#sliderVolume").slider({
+                max : 100,
+                orientation : "vertical",
+                value : 50,
+                slide: function( event, ui ) {
+                    $( "#volumeLevel" ).val( ui.value );
+                    setVideoVolume(ui.value);
+                }
+            });
+        });
     </script>
     <!-- Fav and touch icons -->
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="ico/apple-touch-icon-144-precomposed.png">
@@ -126,7 +144,7 @@
     <link rel="shortcut icon" href="ico/favicon.png">
 </head>
 
-<body>
+<body onload="loadPlayer()">
 
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
@@ -149,18 +167,35 @@
 </div>
 
 <div class="container">
-    <button onclick="loadPlayer()">Run</button>
-    <div id="youtubePlayer">
-        You need Flash player 8+ and JavaScript enabled to view this video.
-    </div>
-    <p>Player state: <span id="playerState">--</span></p>
-    <p>Current Time: <span id="videoCurrentTime">--:--</span> | Duration: <span id="videoDuration">--:--</span></p>
-    <p>Bytes Total: <span id="bytesTotal">--</span> | Start Bytes: <span id="startBytes">--</span> | Bytes Loaded: <span id="bytesLoaded">--</span></p>
-    <p><input id="volumeSetting" type="text" size="3" />&nbsp;<a href="javascript:void(0)" onclick="setVideoVolume();">&lt;- Set Volume</a> | Volume: <span id="volume">--</span></p>
+    <div class="row-fluid">
+        <div class="span7">
+            <div id="youtubePlayer">
+                You need Flash player 8+ and JavaScript enabled to view this video.
+            </div>
+            <!--<div class="progress progress-danger">-->
+                <div id="sliderVolume" style="margin:10px 0px;"></div>
+            <p>
+                <label for="volumeLevel">Volume:</label>
+                <input type="text" value="50" id="volumeLevel" style="border: 0; color: #f6931f; font-weight: bold;" />
+            </p>
+            <!--</div>-->
+            <button class="btn btn-custom" id="btnPlay" onclick="playVideo();">Play</button>
+            <button class="btn btn-custom" id="btnPause" onclick="pauseVideo()">Pause</button>
+            <button class="btn btn-custom" id="btnMute" onclick="muteVideo()">Mute</button>
+            <button class="btn btn-custom" id="btnTest" onclick="test()">Mutex</button>
 
-    <button class="btn-custom" id="btnPlay" onclick="playVideo();">Play</button>
-    <button class="btn-custom" id="btnPause" onclick="pauseVideo()">Pause</button>
-    <button class="btn-custom" id="btnMute" onclick="muteVideo()">Mute</button>
+        </div>
+        <div class="span4 offset1">
+            <p>Player state: <span id="playerState">--</span></p>
+            <p>Current Time: <span id="videoCurrentTime">--:--</span> | Duration: <span id="videoDuration">--:--</span></p>
+            <p>Bytes Total: <span id="bytesTotal">--</span> | Start Bytes: <span id="startBytes">--</span> | Bytes Loaded: <span id="bytesLoaded">--</span></p>
+
+        </div>
+    </div>
+
+
+
+
 </div> <!-- /container -->
 
 
