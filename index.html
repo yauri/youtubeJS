@@ -97,6 +97,38 @@
             }
         }
 
+        function seekTo(seconds) {
+            if(ytplayer) {
+                ytplayer.seekTo(seconds);
+            }
+        }
+
+        function onPlayerStateChange(playerState) {
+            switch (playerState)
+            {
+                case -1 : //unstarted
+                    break;
+                case 0 : //ended
+                        alert("video ended");
+                    break;
+                case 1 : //playing
+                    document.getElementById("duration").value = ytplayer.getDuration();
+                    $("#sliderVideo").slider( "option", "max", ytplayer.getDuration());
+//                    document.getElementById("maxValue").value = document.getElementById("sliderVideo").max;
+                    break;
+                case 2 : //paused
+                    break;
+                case 3 : //buffering
+                    break;
+                case 5 : //videocued
+                    break;
+            }
+        }
+
+        function onPlayerError(errorMessage) {
+            alert(errorMessage);
+        }
+
         // This function is automatically called by the player once it loads
         function onYouTubePlayerReady(playerId) {
             ytplayer = document.getElementById("ytplayer");
@@ -107,7 +139,7 @@
             ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
             ytplayer.addEventListener("onError", "onPlayerError");
             //Load an initial video into the player
-            ytplayer.cueVideoById("OZLUa8JUR18");
+            ytplayer.cueVideoById("lWA2pjMjpBs");
         }
 
         // The "main method" of this sample. Called when someone clicks "Run".
@@ -122,6 +154,8 @@
                     "youtubePlayer", "480", "295", "9", null, null, params, atts);
         }
 
+
+
     </script>
     <script>
         $(function() {
@@ -130,8 +164,15 @@
                 orientation : "vertical",
                 value : 50,
                 slide: function( event, ui ) {
-                    $( "#volumeLevel" ).val( ui.value );
+                    $("#volumeLevel").val(ui.value);
                     setVideoVolume(ui.value);
+                }
+            });
+            $("#sliderVideo").slider({
+                max : 50,
+                slide : function (event, ui) {
+                    seekTo(ui.value);
+                    $("#sliderVideoValue").val(ui.value);
                 }
             });
         });
@@ -172,17 +213,19 @@
             <div id="youtubePlayer">
                 You need Flash player 8+ and JavaScript enabled to view this video.
             </div>
-            <!--<div class="progress progress-danger">-->
+                <div id="sliderVideo" style="margin:10px 0px"></div>
+                Video Duration : <input type="text" value="0" id="duration" readonly />seconds <br>
+                Video Slider Value :<input type="text" value="0" id="sliderVideoValue" readonly />
                 <div id="sliderVolume" style="margin:10px 0px;"></div>
             <p>
                 <label for="volumeLevel">Volume:</label>
-                <input type="text" value="50" id="volumeLevel" style="border: 0; color: #f6931f; font-weight: bold;" />
+                <input type="text" value="50" id="volumeLevel" style="border: 0; color: #f6931f; font-weight: bold;" readonly />
             </p>
-            <!--</div>-->
+
             <button class="btn btn-custom" id="btnPlay" onclick="playVideo();">Play</button>
             <button class="btn btn-custom" id="btnPause" onclick="pauseVideo()">Pause</button>
             <button class="btn btn-custom" id="btnMute" onclick="muteVideo()">Mute</button>
-            <button class="btn btn-custom" id="btnTest" onclick="test()">Mutex</button>
+            <!--<button class="btn btn-custom" id="btnTest" onclick="test()">Mutex</button>-->
 
         </div>
         <div class="span4 offset1">
@@ -192,7 +235,6 @@
 
         </div>
     </div>
-
 
 
 
