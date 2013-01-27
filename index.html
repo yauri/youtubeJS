@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>No Title</title>
+    <title>Youtube API JS Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -23,7 +22,6 @@
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <script type="text/javascript" src="js/swfobject.js"></script>
-    <!--<script type="text/javascript" src="js/youtubeplayer.js"></script>-->
     <script src="http://www.google.com/jsapi" type="text/javascript"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
@@ -42,35 +40,29 @@
             alert("An error occured of type:" + errorCode);
         }
 
-        // This function is called when the player changes state
-        function onPlayerStateChange(newState) {
-            updateHTML("playerState", newState);
-        }
-
         // Display information about the current state of the player
         function updatePlayerInfo() {
             // Also check that at least one function exists since when IE unloads the
             // page, it will destroy the SWF before clearing the interval.
             if(ytplayer && ytplayer.getDuration) {
+                updateHTML("playerState", ytplayer.getPlayerState());
                 updateHTML("videoDuration", ytplayer.getDuration());
                 updateHTML("videoCurrentTime", ytplayer.getCurrentTime());
                 updateHTML("bytesTotal", ytplayer.getVideoBytesTotal());
                 updateHTML("startBytes", ytplayer.getVideoStartBytes());
                 updateHTML("bytesLoaded", ytplayer.getVideoBytesLoaded());
-//                updateHTML("volume", ytplayer.getVolume());
             }
         }
 
         // Allow the user to set the volume from 0-100
         function setVideoVolume(volumeLevel) {
-//            var volume = parseInt(document.getElementById("volumeSetting").value);
-//            if(isNaN(volume) || volume < 0 || volume > 100) {
-//                alert("Please enter a valid volume between 0 and 100.");
-//            }
-//            else if(ytplayer){
-//                ytplayer.setVolume(volume);
-//            }
             ytplayer.setVolume(volumeLevel);
+        }
+
+        function loadVideo() {
+            if(ytplayer) {
+                ytplayer.cueVideoById(document.getElementById("youtubeVideoId").value);
+            }
         }
 
         function playVideo() {
@@ -103,18 +95,21 @@
             }
         }
 
+        function updateSlider() {
+            $("#sliderVideo").slider({value : ytplayer.getCurrentTime()});
+        };
+
         function onPlayerStateChange(playerState) {
             switch (playerState)
             {
                 case -1 : //unstarted
                     break;
                 case 0 : //ended
-                        alert("video ended");
+                        ytplayer.cueVideoById("lWA2pjMjpBs");
                     break;
                 case 1 : //playing
-                    document.getElementById("duration").value = ytplayer.getDuration();
                     $("#sliderVideo").slider( "option", "max", ytplayer.getDuration());
-//                    document.getElementById("maxValue").value = document.getElementById("sliderVideo").max;
+                    setInterval(updateSlider, 1000);
                     break;
                 case 2 : //paused
                     break;
@@ -138,8 +133,6 @@
             updatePlayerInfo();
             ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
             ytplayer.addEventListener("onError", "onPlayerError");
-            //Load an initial video into the player
-            ytplayer.cueVideoById("lWA2pjMjpBs");
         }
 
         // The "main method" of this sample. Called when someone clicks "Run".
@@ -154,14 +147,11 @@
                     "youtubePlayer", "480", "295", "9", null, null, params, atts);
         }
 
-
-
     </script>
     <script>
         $(function() {
             $("#sliderVolume").slider({
                 max : 100,
-                orientation : "vertical",
                 value : 50,
                 slide: function( event, ui ) {
                     $("#volumeLevel").val(ui.value);
@@ -169,11 +159,13 @@
                 }
             });
             $("#sliderVideo").slider({
-                max : 50,
                 slide : function (event, ui) {
                     seekTo(ui.value);
                     $("#sliderVideoValue").val(ui.value);
                 }
+            });
+            $("#youtubeVideoId").bind("keyup",function(){
+                loadVideo();
             });
         });
     </script>
@@ -195,53 +187,34 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </a>
-            <a class="brand" href="#">Project name</a>
-            <div class="nav-collapse collapse">
-                <ul class="nav">
-                    <li class="active"><a href="#">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </div><!--/.nav-collapse -->
+            <a class="brand" href="javascript:void(0)">Youtube API JS Demo</a>
         </div>
     </div>
 </div>
 
 <div class="container">
     <div class="row-fluid">
+        <label for="youtubeVideoId">Youtube Video ID : </label><input id="youtubeVideoId" onchange="loadVideo()" type="text" />
+    </div>
+    <div class="row-fluid">
         <div class="span7">
             <div id="youtubePlayer">
                 You need Flash player 8+ and JavaScript enabled to view this video.
             </div>
-                <div id="sliderVideo" style="margin:10px 0px"></div>
-                Video Duration : <input type="text" value="0" id="duration" readonly />seconds <br>
-                Video Slider Value :<input type="text" value="0" id="sliderVideoValue" readonly />
-                <div id="sliderVolume" style="margin:10px 0px;"></div>
-            <p>
-                <label for="volumeLevel">Volume:</label>
-                <input type="text" value="50" id="volumeLevel" style="border: 0; color: #f6931f; font-weight: bold;" readonly />
-            </p>
-
+            <div id="sliderVideo" style="margin:10px 0px; width:480px;"></div>
+            <div id="sliderVolume" style="margin:10px 0px; width:100px;"></div>
             <button class="btn btn-custom" id="btnPlay" onclick="playVideo();">Play</button>
             <button class="btn btn-custom" id="btnPause" onclick="pauseVideo()">Pause</button>
             <button class="btn btn-custom" id="btnMute" onclick="muteVideo()">Mute</button>
-            <!--<button class="btn btn-custom" id="btnTest" onclick="test()">Mutex</button>-->
-
+            <button class="btn btn-custom" id="btnTest" onclick="unMuteVideo()">UnMute</button>
         </div>
         <div class="span4 offset1">
             <p>Player state: <span id="playerState">--</span></p>
             <p>Current Time: <span id="videoCurrentTime">--:--</span> | Duration: <span id="videoDuration">--:--</span></p>
             <p>Bytes Total: <span id="bytesTotal">--</span> | Start Bytes: <span id="startBytes">--</span> | Bytes Loaded: <span id="bytesLoaded">--</span></p>
-
         </div>
     </div>
-
-
-
 </div> <!-- /container -->
-
-
-
 
 </body>
 </html>
